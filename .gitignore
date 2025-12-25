@@ -1,0 +1,6 @@
+datasets/
+main.dSYM/
+.DS_Store
+./main
+.vscode
+main
