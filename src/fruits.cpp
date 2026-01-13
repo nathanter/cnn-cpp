@@ -1,7 +1,7 @@
 // code that was previously used for loading fruits dataset
 
-#include "fruits.h"
-#include "tensor.h"
+#include "fruits.hpp"
+#include "tensor.hpp"
 #include <filesystem>
 
 using namespace std;

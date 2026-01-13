@@ -1,7 +1,7 @@
 
 #ifndef MATH_HELPERS_H
 #define MATH_HELPERS_H
-#include "tensor.h"
+#include "tensor.hpp"
 
 Tensor apply_relu_back_prop(Tensor &valid_spots, Tensor &losses);
 

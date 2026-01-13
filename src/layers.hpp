@@ -1,4 +1,4 @@
-#include "tensor.h"
+#include "tensor.hpp"
 
 #ifndef CONV_H
 #define CONV_H

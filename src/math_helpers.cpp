@@ -1,4 +1,6 @@
-#include "tensor.h"
+#include "math_helpers.hpp"
+#include "tensor.hpp"
+
 using namespace std;
 
 Tensor apply_relu_back_prop(Tensor &valid_spots, Tensor &losses) {

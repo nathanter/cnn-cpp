@@ -1,11 +1,11 @@
-#include "layers.h"
+#include "layers.hpp"
 #include <array>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <random>
+#include "math_helpers.hpp"
 #define STB_IMAGE_IMPLEMENTATION
-#include "math_helpers.h"
 #include "stb_image.h"
 #include <chrono>
 #include <sstream>
