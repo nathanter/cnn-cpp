@@ -6,7 +6,6 @@
 #include <random>
 #include "math_helpers.hpp"
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 #include <chrono>
 #include <sstream>
 
@@ -73,20 +72,59 @@ Tensor translate_image_to_tensor(string path, Tensor &image) {
   return image;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
 
+  //params that need to be set before running
   const int WIDTH = 28;
   const int HEIGHT = 28;
-  Conv_Layer2D cvl1(10);
-  cvl1.Rand_filter();
-  Pool_Layer2x2 pl;
   int labels = 10;
+  // preinitialization 
+  Conv_Layer2D cvl1(10);
+  Pool_Layer2x2 pl;
   Layer l1(labels, ((WIDTH - 2) / 2) * ((WIDTH - 2) / 2) * 10);
+  
+	
+
+  // Parse input.
+  if (argc < 2) {
+    printf("Please supply a command [train, eval].\n");
+  }
+
+  std::string command_string = std::string(argv[1]);
+
+  // Train:
+  // - take in path
+  // if folder of images: convert to csv
+  // else. take csv
+  // run through train function
+  // return and print path to text file that stores weights in csv
+  if (command_string == "train") {
+
+    
+
+  // eval:
+  // - take in path
+  // if image: convert to csv
+  // else. take csv
+  // use model path to load weights
+  // evaluate and return prediction
+  // return and print path to text file that stores weights in csv
+  } else if (command_string == "eval") {
+
+  } else {
+    printf("Provided command \"%s\" is invalid, please provide a valid command [train, eval].", command_string.c_str());
+  }
+
+  for (uint i = 0; i < argc; i += 1) {
+    printf("%s ", argv[i]);
+  }
+
+
+  cvl1.Rand_filter();
   l1.randomize_weights();
   l1.randomize_biases();
 
-  const std::filesystem::path training{
-      "datasets/fruits-360_100x100/fruits-360/Training"};
+  //const std::filesystem::path training{"datasets/fruits-360_100x100/fruits-360/Training"};
 
   Tensor image(WIDTH, HEIGHT); // preinitializing image
   Tensor result(1, 1);         // preinitializing result tensor
@@ -96,8 +134,8 @@ int main() {
   // int folder_index = 0;
 
   // load csv dataset;
-  //  load rows into csv data, index 0 is label rest are inputs
-  //  initialize training data
+  // load rows into csv data, index 0 is label rest are inputs
+  // initialize training data
 
   ifstream input("datasets/Mnist-fashion/fashion-mnist_train.csv");
   string trash;
@@ -120,15 +158,6 @@ int main() {
     for (auto runs = 0; runs < runs_in_epoch; runs++) {
       // this process is for loading from the fruits dataset
       // uncomment to use that dataset
-      /*
-      int rand_folder = rand() % 6;
-      label = rand_folder;
-      // generate random number between 0 and 4;
-      int rand_image = rand() % folder_names[rand_folder].size();
-      std::filesystem::path img_entry = folder_names[rand_folder][rand_image];
-      p = img_entry.string();
-      image = translate_image_to_tensor(p,image);
-      */
 
       // this line is for loading fashion mnist
       // comment when unused

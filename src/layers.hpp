@@ -71,6 +71,7 @@ public:
     }
     return output;
   }
+
   void backprop(Tensor &losses) {
     Tensor dl_dfilter = data;
     dl_dfilter.zeros();
@@ -82,13 +83,15 @@ public:
       // loss_sum is the sum of all gradients for this filter, will be
       // subtracted from bias.
       for (int ax1 = 0; ax1 < losses.dimen_list[1]; ax1++) {
+        int current_start_of_row = losses.flat_from_indexes(x,ax1,0);
         for (int ax2 = 0; ax2 < losses.dimen_list[2]; ax2++) {
 
           int index_offset = dl_dfilter.flat_from_indexes(x, 0, 0);
           // index_offset is the location where the current filter stars in the
           // conv layers data
           float current_element_in_loss_gradient =
-              losses.get_element_by_indexes(x, ax1, ax2);
+            losses.get_element_flat(current_start_of_row + ax2);
+
           // current_element_in_loss_gradient is the element in the input
           // gradient that affects all the filters;
           loss_sum += current_element_in_loss_gradient;
@@ -101,7 +104,7 @@ public:
                   index_offset + f1 * fil_size + f2,
                   current_element_in_loss_gradient *
                       last_input.get_element_flat(
-                          affected_pixels_by_filter_row + f2));
+                        affected_pixels_by_filter_row + f2));
             }
           }
         }
