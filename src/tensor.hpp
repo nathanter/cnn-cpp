@@ -1,6 +1,7 @@
-#include <array>
 #include <iostream>
 #include <random>
+#include <stdexcept>
+#include <vector>
 
 #ifndef TENSOR_H
 
@@ -26,7 +27,7 @@ public:
   vector<int> indexing_list;
   // each index of this list is the product of all remainign indexes
 
-  template <class... Types> float get_element_by_indexes(Types... indexes) {
+  template <class... Types> float get_element_by_indexes(Types... indexes) const {
     vector<int> arr{indexes...};
     int final_index = 0;
     for (int x = 0; x < dimensions; x++) {
@@ -34,10 +35,10 @@ public:
     }
     return data[final_index];
   }
-  template <class... Types> int flat_from_indexes(Types... indexes) {
+  template <class... Types> int flat_from_indexes(Types... indexes) const {
 
     vector<int> arr{indexes...};
-    if (arr.size() != dimensions) {
+    if (static_cast<int>(arr.size()) != dimensions) {
       throw std::runtime_error("Number of indexes does not match dimensions");
     }
 
@@ -49,7 +50,7 @@ public:
   }
 
   void flat_assign(int flat, float val) { this->data[flat] = val; }
-  float get_element_flat(int flat_index) { return (this->data)[flat_index]; }
+  float get_element_flat(int flat_index) const { return (this->data)[flat_index]; }
 
   void zeros() {
     for (int m = 0; m < (this->size); m++) {
@@ -58,7 +59,7 @@ public:
   }
   void randomize() {
     for (int m = 0; m < (this->size); m++) {
-      data[m] = rand() % 100 / 100;
+      data[m] = static_cast<float>(rand() % 100) / 100.0f;
     }
   }
 
@@ -78,8 +79,10 @@ public:
       cout << indexing_list[m] << endl;
     }
   }
-  void add_to_index(int x, int v) { data[x] += v; }
-  Tensor() : dimensions{1} {}
+  void add_to_index(int x, float v) { data[x] += v; }
+  Tensor()
+      : data(1, 0.0f), dimensions{1}, dimen_list(1, 1), size{1},
+        indexing_list(1, 1) {}
   template <class... Types>
   Tensor(Types... args) : dimensions{sizeof...(args)} {
 
@@ -108,7 +111,7 @@ public:
     this->dimen_list = inputarray;
     int total_size{1};
     this->indexing_list = vector<int>(dimensions);
-    for (int l = 0; l < inputarray.size(); l++) {
+    for (int l = 0; l < static_cast<int>(inputarray.size()); l++) {
 
       total_size *= inputarray[l];
     }

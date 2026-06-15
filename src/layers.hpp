@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <cmath>
+#include <random>
 #include "tensor.hpp"
 
 #ifndef CONV_H
@@ -63,7 +66,7 @@ public:
                   this->data.get_element_by_indexes(node, f1, f2));
             }
           }
-          sum += biases_data.get_element_flat(nodes);
+          sum += biases_data.get_element_flat(node);
 
           output.flat_assign(output.flat_from_indexes(node, ax1, ax2), sum);
         }
@@ -255,23 +258,29 @@ public:
         for (int y = 0; y < new_dimeny; y++) {
           int offset_1 = input.flat_from_indexes(neuron, x * 2, y * 2);
           // offset for first row of 2x2
-          int offset_2 = input.flat_from_indexes(neuron, x * 2 + 1, y * 2);
-          // offset for second layer of 2x2
-          float pooled_value = max({i_d[offset_1], i_d[offset_2],
-                                    i_d[offset_1 + 1], i_d[offset_2 + 1]});
+          const int pool_start_x = x * 2;
+          const int pool_start_y = y * 2;
+          const int pool_end_x =
+              std::min(pool_start_x + 2, input.dimen_list[1]);
+          const int pool_end_y =
+              std::min(pool_start_y + 2, input.dimen_list[2]);
 
-          for (int pool_area_x = 0; pool_area_x < 2; pool_area_x++) {
+          float pooled_value = -INFINITY;
+          int pooled_origin = offset_1;
 
-            if (i_d[offset_1 + pool_area_x] == pooled_value) {
-              max_origin[last_output.flat_from_indexes(neuron, x, y)] =
-                  offset_1 + pool_area_x;
-              break;
-            } else if (i_d[offset_2 + pool_area_x] == pooled_value) {
-              max_origin[last_output.flat_from_indexes(neuron, x, y)] =
-                  offset_2 + pool_area_x;
-              break;
+          for (int source_x = pool_start_x; source_x < pool_end_x; source_x++) {
+            for (int source_y = pool_start_y; source_y < pool_end_y; source_y++) {
+              const int source_index =
+                  input.flat_from_indexes(neuron, source_x, source_y);
+              if (i_d[source_index] > pooled_value) {
+                pooled_value = i_d[source_index];
+                pooled_origin = source_index;
+              }
             }
           }
+
+          max_origin[last_output.flat_from_indexes(neuron, x, y)] =
+              pooled_origin;
 
           last_output.flat_assign(last_output.flat_from_indexes(neuron, x, y),
                                   pooled_value);
@@ -290,8 +299,8 @@ public:
 
     vector<int> &m_d = max_origin;
 
-    new_dimenx = dlwrti.dimen_list[1] / 2;
-    new_dimeny = dlwrti.dimen_list[2] / 2;
+    new_dimenx = losses.dimen_list[1];
+    new_dimeny = losses.dimen_list[2];
 
     for (int n = 0; n < dlwrti.dimen_list[0]; n++) {
       for (int x = 0; x < new_dimenx; x++) {

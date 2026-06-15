@@ -1,7 +1,30 @@
 To build and run.
 
 ```sh
-g++ -std=c++17 -O3 main.cpp -o main && ./main
+g++ -std=c++17 -O3 src/main.cpp src/math_helpers.cpp src/fruits.cpp src/csv_helpers/image_to_csv.cpp src/csv_helpers/read_csv.cpp src/csv_helpers/write_to_csv.cpp -o main
+```
+
+Train and save a model:
+
+```sh
+./main train
+```
+this saves 4 files which will be the weights and biases for the conv and dense layers.
+
+Evaluate a saved model on the default Fashion-MNIST test csv:
+
+```sh
+./main eval
+```
+
+train can be used along with a system path to store the models at a specific location
+```sh
+./main train {{path}}
+```
+
+eval command can optionally use up to two extra commands indicating a model directory to use or a another csv file path to test the model on.
+```sh
+./main eval {{model directory}} {{csv file path}}
 ```
 
 Implementation of a convolutional neural network from scratch.
@@ -13,11 +36,16 @@ https://www.kaggle.com/datasets/zalando-research/fashionmnist
 https://www.kaggle.com/datasets/moltean/fruits 
 
 
+
+# Architecture
+
 The neural network consists of a convolutional layer that uses 3x3 filters. The activation function for this layer is RELU.
 Following the convolutional layer is a pooling layer that shortens the input using MaxPool on a 2x2 area
 Finally a fully connected dense layer with the same amount of neurons as inputs(6 for tested subsection of fruits 360 and 10 for mnist-fashion)
 
 along with the implemented neural network is classes for a Tensor object, a 3x3 2D Conv Layer, a 2x2 2D Pool layer, and a layer with weights and biases.
+
+
 
 # Results:
 
@@ -31,5 +59,4 @@ Fashion-Mnist- 10 Classes:
 
 Fruits- 6 Classes(first 6 folders of apples out of 237 fruits):
 * Trials 1-3: ~30%
-
 

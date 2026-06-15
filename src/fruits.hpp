@@ -1,5 +1,6 @@
 
 #include <filesystem>
+#include <vector>
 using namespace std;
 
 #ifndef LOADING_FRUITS
