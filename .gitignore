@@ -1,7 +1,8 @@
-datasets/
+
 main.dSYM/
 .DS_Store
 ./main
 .vscode
 main
 models
+datasets/fruits-360_100x100
