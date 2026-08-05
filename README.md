@@ -1,4 +1,13 @@
-To build and run.
+## Convolutional Neural Network from scratch
+Implementation of a convolutional neural network from scratch.
+
+Tested by running on subset of fruits 360 dataset and Mnist-fashion.
+
+https://www.kaggle.com/datasets/zalando-research/fashionmnist
+
+https://www.kaggle.com/datasets/moltean/fruits 
+
+## To build and run.
 
 ```sh
 g++ -std=c++17 -O3 src/main.cpp src/math_helpers.cpp src/fruits.cpp src/csv_helpers/image_to_csv.cpp src/csv_helpers/read_csv.cpp src/csv_helpers/write_to_csv.cpp -o main
@@ -27,13 +36,7 @@ eval command can optionally use up to two extra commands indicating a model dire
 ./main eval {{model directory}} {{csv file path}}
 ```
 
-Implementation of a convolutional neural network from scratch.
 
-Tested by running on subset of fruits 360 dataset and Mnist-fashion.
-
-https://www.kaggle.com/datasets/zalando-research/fashionmnist
-
-https://www.kaggle.com/datasets/moltean/fruits 
 
 
 

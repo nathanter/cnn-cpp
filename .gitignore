@@ -5,6 +5,8 @@ main.dSYM/
 .vscode
 main
 models
-datasets/fruits-360_100x100
+datasets/*
+!datasets/.gitkeep
+
 more_dense_plan.md
 .gitignore
