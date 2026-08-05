@@ -1,3 +1,2 @@
 #!/bin/sh
-
-g++ -std=c++17 -g -Wall -O3 src/*.cpp -o main
+`g++ -std=c++17 -O3 src/main.cpp src/math_helpers.cpp src/fruits.cpp src/csv_helpers/image_to_csv.cpp src/csv_helpers/read_csv.cpp src/csv_helpers/write_to_csv.cpp -o main`

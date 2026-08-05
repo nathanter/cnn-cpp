@@ -6,3 +6,5 @@ main.dSYM/
 main
 models
 datasets/fruits-360_100x100
+more_dense_plan.md
+.gitignore

@@ -74,14 +74,22 @@ Tensor soft_max_opertation(Tensor &input, int correct_label) {
   // result totals of the last pass the tensor should be equal to soft_max
   // probabilities - expected value;
 
+
+    
+  // get the max of the results of the previous layer.
   Tensor loss(input.size);
   float maxv = -INFINITY;
   for (int x = 0; x < input.size; x++) {
     maxv = max(maxv, input.get_element_flat(x));
   }
+
+  // part 1 of softmax get sum of all exponentials for values in the list.
   float esum = calc_exp_sum(input, maxv);
 
+
   float target_val;
+
+  // 
   for (int x = 0; x < input.size; x++) {
     target_val = (exp(input.get_element_flat(x) - maxv) / esum);
     input.flat_assign(x, target_val);

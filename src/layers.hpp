@@ -141,21 +141,22 @@ public:
   }
 
   void randomize_weights() {
+    // use HE intialization here as with above.
+    float stddev = sqrt(2.0f / this->inputs);
+    std::normal_distribution<float> dist(0.0f, stddev);
+    static std::default_random_engine generator(std::random_device{}());
 
     for (int x = 0; x < this->nodes; x++) {
       for (int y = 0; y < this->inputs; y++) {
-        weights.flat_assign(weights.flat_from_indexes(x, y),
-                            (static_cast<float>(rand() % 200) - 100.00) /
-                                100.00);
+        weights.flat_assign(weights.flat_from_indexes(x, y), dist(generator));
       }
     }
   }
   void randomize_biases() {
-
+    // small random instead of 0 because relu.
     for (int x = 0; x < this->nodes; x++) {
 
-      biases.flat_assign(x,
-                         (static_cast<float>(rand() % 200) - 100.00) / 100.00);
+      biases.flat_assign(x, 0.01f);
     }
   }
 
@@ -194,10 +195,18 @@ public:
 
     newloss.zeros();
 
-    auto &w_d = weights.data;
+    // we update loss by calculating the d_loss/d_weight or d_loss/d_bias.
+    // the relu layer gets the delta loss with respect to the output of this function including the activation layer.
+    // the result of relu backprop returns the delta_loss/delta_z (z is output of the weight sum)
+    // delta_loss/delta_z * delta_z/delta_w = delta_loss/d_weight
+    // d_z/d_w = input  because z = w1*x1 + w2*x2 + whatever.
+    // everything else is constants that go to 0. 
+
+    auto &w_d = weights.data; 
     auto &b_d = biases.data;
     auto &l_d = losses.data;
     auto &n_d = newloss.data;
+
     for (int x = 0; x < nodes; x++) {
       float loss_for_this_label = l_d[x];
       b_d[x] -= learning_rate * loss_for_this_label;
@@ -207,7 +216,7 @@ public:
 
         n_d[y] += w_d[current_index_offset + y] * loss_for_this_label;
 
-        // assign n  ew loss before changing weights
+        // assign new loss before changing weights
         w_d[current_index_offset + y] -= learning_rate *
                                          last_inputs.get_element_flat(y) *
                                          loss_for_this_label;
