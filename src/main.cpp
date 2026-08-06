@@ -22,7 +22,7 @@ namespace
     constexpr int kWidth = 28;
     constexpr int kHeight = 28;
     constexpr int kLabels = 10;
-    constexpr int kConvNodes = 10;
+    constexpr int kConvNodes = 20;
     constexpr int kEpochs = 15;
     constexpr int kDenseInputSize = ((kWidth - 2) / 2) * ((kHeight - 2) / 2) * kConvNodes;
 
@@ -191,6 +191,9 @@ namespace
         vector<Layer> dense_layers = build_dense_layers(hidden_sizes);
         initialize_model(conv_layer, dense_layers);
 
+
+        float learning_rate = 0.01f;
+
         const auto csv_data = read_csv_rows(kTrainCsv, true);
         const auto csv_test_data = read_csv_rows(kTestCsv, true);
 
@@ -202,6 +205,8 @@ namespace
         Tensor image(kHeight, kWidth);
         vector<int> row_indexes(csv_data.size());
 
+
+        // intialize this so we can rearrange training order
         for (int index = 0; index < static_cast<int>(row_indexes.size()); index++)
         {
             row_indexes[index] = index;
@@ -213,10 +218,22 @@ namespace
         // training loop
         for (int epoch = 0; epoch < kEpochs; epoch++)
         {
+            if (epoch == 8)
+            {
+                learning_rate /= 2.0f;
+                conv_layer.update_learning_rate(learning_rate);
+                for (Layer &dense_layer : dense_layers)
+                {
+                    dense_layer.update_learning_rate(learning_rate);
+                }
+            }
+
             shuffle(row_indexes.begin(), row_indexes.end(), rng);
 
             float epoch_loss = 0.0f;
             int epoch_correct = 0;
+
+
 
             for (const int row_index : row_indexes)
             {
@@ -258,6 +275,7 @@ namespace
                 }
                 loss = pool_layer.back_prop(loss);
                 loss = apply_relu_back_prop(conv_relu_mask, loss);
+
                 conv_layer.backprop(loss);
             }
 

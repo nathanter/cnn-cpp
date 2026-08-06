@@ -19,6 +19,9 @@ public:
   Conv_Layer2D(int neurons) : data(neurons, 3, 3), biases_data(neurons) {
     this->nodes = neurons;
   }
+  void update_learning_rate(float new_rate) {
+    (*this).learning_rate = new_rate;
+  }
   void Rand_filter() {
     int fan_in = 9;
     float stddev = sqrt(2.0f / fan_in);
@@ -187,6 +190,11 @@ public:
   void print_filters() {
     // debugging method
     weights.print_data();
+  }
+
+
+  void update_learning_rate(float new_rate) {
+    (*this).learning_rate = new_rate;
   }
 
   Tensor back_prop(Tensor &losses) {
