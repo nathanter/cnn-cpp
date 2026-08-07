@@ -1,4 +1,4 @@
-
+optimization.md
 main.dSYM/
 .DS_Store
 ./main
@@ -10,3 +10,6 @@ datasets/*
 
 more_dense_plan.md
 .gitignore
+
+scripts/verify
+tests

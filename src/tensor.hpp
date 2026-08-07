@@ -28,13 +28,9 @@ public:
   // each index of this list is the product of all remainign indexes
 
   template <class... Types> float get_element_by_indexes(Types... indexes) const {
-    vector<int> arr{indexes...};
-    int final_index = 0;
-    for (int x = 0; x < dimensions; x++) {
-      final_index += arr[x] * indexing_list[x];
-    }
-    return data[final_index];
+    return data[flat_from_indexes(indexes...)];
   }
+
   template <class... Types> int flat_from_indexes(Types... indexes) const {
 
     vector<int> arr{indexes...};
@@ -50,6 +46,7 @@ public:
   }
 
   void flat_assign(int flat, float val) { this->data[flat] = val; }
+  
   float get_element_flat(int flat_index) const { return (this->data)[flat_index]; }
 
   void zeros() {
@@ -106,7 +103,7 @@ public:
     this->data = vector<float>(total_size);
     this->size = total_size;
   }
-  Tensor(vector<int> inputarray)
+  Tensor(const vector<int>& inputarray)
       : dimensions{static_cast<int>(inputarray.size())} {
     this->dimen_list = inputarray;
     int total_size{1};

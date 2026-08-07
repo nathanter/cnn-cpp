@@ -24,8 +24,7 @@ Tensor apply_relu_activation(Tensor &input) {
   // remember where values are positive/negative
   // store this in mask
 
-  Tensor mask = input;
-  mask.zeros();
+  Tensor mask(input.dimen_list);
 
   for (int x = 0; x < input.size; x++) {
     if (input.data[x] > 0) {
@@ -102,7 +101,7 @@ Tensor soft_max_opertation(Tensor &input, int correct_label) {
   return loss;
 }
 
-int get_max(Tensor input) {
+int get_max(const Tensor& input) {
   // returns the index of the max element in a tensor
 
   float max = -INFINITY;

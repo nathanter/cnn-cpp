@@ -22,8 +22,8 @@ namespace
     constexpr int kWidth = 28;
     constexpr int kHeight = 28;
     constexpr int kLabels = 10;
-    constexpr int kConvNodes = 20;
-    constexpr int kEpochs = 15;
+    constexpr int kConvNodes = 32;
+    constexpr int kEpochs = 17;
     constexpr int kDenseInputSize = ((kWidth - 2) / 2) * ((kHeight - 2) / 2) * kConvNodes;
 
     const filesystem::path kTrainCsv = "datasets/Mnist-fashion/fashion-mnist_train.csv";
@@ -189,6 +189,7 @@ namespace
         Conv_Layer2D conv_layer(kConvNodes);
         Pool_Layer2x2 pool_layer;
         vector<Layer> dense_layers = build_dense_layers(hidden_sizes);
+
         initialize_model(conv_layer, dense_layers);
 
 
@@ -218,7 +219,7 @@ namespace
         // training loop
         for (int epoch = 0; epoch < kEpochs; epoch++)
         {
-            if (epoch == 8)
+            if (epoch %5 == 0 && epoch != 0)
             {
                 learning_rate /= 2.0f;
                 conv_layer.update_learning_rate(learning_rate);

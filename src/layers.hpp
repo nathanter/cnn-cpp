@@ -45,6 +45,8 @@ public:
     // debugging method
     data.print_data();
   }
+
+  // note this function is moving towards just doing the arithmetic by hand because using the variable arg functions in tensor is too expensive.
   Tensor feed_forward(Tensor &input) {
     this->last_input = input;
     // not any tensor safe
@@ -56,23 +58,32 @@ public:
     // for x indexes
     // run 3 by 3 filter on 0
     // all the way to size - 3
-
+    int out_index = 0;
     for (int node = 0; node < this->nodes; node++) {
-
+      int start_of_filter_in_conv_weights = this -> data.flat_from_indexes(node,0,0);
+      // this tracks the same thing as input.flat_from_indexes(ax1,ax2) by incrementing it every inner loop of the axis loop
+    
       for (int ax1 = 0; ax1 <= input.dimen_list[0] - 3; ax1++) {
         for (int ax2 = 0; ax2 <= input.dimen_list[1] - 3; ax2++) {
           float sum = 0.00;
+          int start_of_filter_in_input = ax1 * input.indexing_list[0] + ax2 * input.indexing_list[1];
+            
+          
           for (int f1 = 0; f1 < fil_size; f1++) {
+            int place_in_input_tensor = input.indexing_list[0] * f1 + start_of_filter_in_input;
             for (int f2 = 0; f2 < fil_size; f2++) {
               sum += static_cast<float>(
-                  input.get_element_by_indexes(ax1 + f1, ax2 + f2) *
-                  this->data.get_element_by_indexes(node, f1, f2));
+                  input.get_element_flat(place_in_input_tensor + f2) *
+                  this -> data.get_element_flat(start_of_filter_in_conv_weights + f1 * fil_size + f2));
             }
           }
+
           sum += biases_data.get_element_flat(node);
 
-          output.flat_assign(output.flat_from_indexes(node, ax1, ax2), sum);
+          output.flat_assign(out_index,sum);
+          out_index++;
         }
+
       }
     }
     return output;
@@ -178,6 +189,7 @@ public:
     for (int x = 0; x < nodes; x++) {
       float d_product = 0;
       int index_offset = x * this->inputs;
+      
       for (int y = 0; y < this->inputs; y++) {
         d_product += i_d[y] * w_d[index_offset + y];
       }

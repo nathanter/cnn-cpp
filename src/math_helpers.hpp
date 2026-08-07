@@ -11,7 +11,7 @@ void apply_soft_max(Tensor &input);
 
 Tensor soft_max_opertation(Tensor &input, int correct_label);
 
-int get_max(Tensor input);
+int get_max(const Tensor& input);
 
 float convert_to_float(unsigned char r, unsigned char g, unsigned char b);
 
