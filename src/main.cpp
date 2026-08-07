@@ -14,7 +14,11 @@
 #include <stdexcept>
 #include <string>
 
-using namespace std;
+using std::vector;
+using std::string;
+using std::cout;
+using std::endl;
+
 
 namespace
 {
@@ -22,13 +26,13 @@ namespace
     constexpr int kWidth = 28;
     constexpr int kHeight = 28;
     constexpr int kLabels = 10;
-    constexpr int kConvNodes = 32;
-    constexpr int kEpochs = 17;
+    constexpr int kConvNodes = 64;
+    constexpr int kEpochs = 20;
     constexpr int kDenseInputSize = ((kWidth - 2) / 2) * ((kHeight - 2) / 2) * kConvNodes;
 
-    const filesystem::path kTrainCsv = "datasets/Mnist-fashion/fashion-mnist_train.csv";
-    const filesystem::path kTestCsv = "datasets/Mnist-fashion/fashion-mnist_test.csv";
-    const filesystem::path kDefaultModelDir = "models/fashion-mnist";
+    const std::filesystem::path kTrainCsv = "datasets/Mnist-fashion/fashion-mnist_train.csv";
+    const std::filesystem::path kTestCsv = "datasets/Mnist-fashion/fashion-mnist_test.csv";
+    const std::filesystem::path kDefaultModelDir = "models/fashion-mnist";
 
     void print_usage(const char *program_name)
     {
@@ -145,10 +149,10 @@ namespace
                static_cast<float>(total_entries);
     }
 
-    void save_model(const filesystem::path &model_dir, const Conv_Layer2D &conv_layer,
+    void save_model(const std::filesystem::path &model_dir, const Conv_Layer2D &conv_layer,
                     const vector<Layer> &dense_layers)
     {
-        filesystem::create_directories(model_dir);
+        std::filesystem::create_directories(model_dir);
         write_tensor_to_csv(conv_layer.data, model_dir / "conv_filters.csv");
         write_tensor_to_csv(conv_layer.biases_data, model_dir / "conv_biases.csv");
         for (int layer = 0; layer < static_cast<int>(dense_layers.size()); layer++)
@@ -160,7 +164,7 @@ namespace
         }
     }
 
-    void load_model(const filesystem::path &model_dir, Conv_Layer2D &conv_layer,
+    void load_model(const std::filesystem::path &model_dir, Conv_Layer2D &conv_layer,
                     vector<Layer> &dense_layers)
     {
         conv_layer.data =
@@ -183,7 +187,7 @@ namespace
         }
     }
 
-    void train_command(const filesystem::path &model_dir, const vector<int> &hidden_sizes)
+    void train_command(const std::filesystem::path &model_dir, const vector<int> &hidden_sizes)
     {
         // for training. Applies relu after each inner layer and softmax at final layer. if only one layer as in previous versions then only softmax is run
         Conv_Layer2D conv_layer(kConvNodes);
@@ -294,8 +298,8 @@ namespace
         cout << "accuracy: " << accuracy << '\n';
     }
 
-    void eval_command(const filesystem::path &model_dir,
-                      const filesystem::path &input_path,
+    void eval_command(const std::filesystem::path &model_dir,
+                      const std::filesystem::path &input_path,
                       const vector<int> &hidden_sizes)
     {
         // as with training uses softmax on the last layer
@@ -336,7 +340,7 @@ int main(int argc, char *argv[])
         if (command_string == "train")
         {
             cout << "training started" << endl;
-            const filesystem::path model_dir =
+            const std::filesystem::path model_dir =
                 argc >= 3 ? filesystem::path(argv[2]) : kDefaultModelDir;
 
             vector<int> hidden_sizes;
@@ -357,9 +361,9 @@ int main(int argc, char *argv[])
 
         if (command_string == "eval")
         {
-            const filesystem::path model_dir =
+            const std::filesystem::path model_dir =
                 argc >= 3 ? filesystem::path(argv[2]) : kDefaultModelDir;
-            const filesystem::path input_path =
+            const std::filesystem::path input_path =
                 argc >= 4 ? filesystem::path(argv[3]) : kTestCsv;
 
             vector<int> hidden_sizes;

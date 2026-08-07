@@ -4,6 +4,7 @@ main.dSYM/
 ./main
 .vscode
 main
+compiler-opt-test
 models
 datasets/*
 !datasets/.gitkeep
@@ -12,4 +13,9 @@ more_dense_plan.md
 .gitignore
 
 scripts/verify
-tests
+tests/*
+!tests/compiler-opt-test.cpp
+!tests/bench_conv.cpp
+handoff.md
+bench_conv
+accum-conv-opt.md

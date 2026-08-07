@@ -4,11 +4,14 @@
 #include "tensor.hpp"
 #include <filesystem>
 
-using namespace std;
-
+using std::vector;
+using std::string;
+using std::cout;
+using std::endl;
 // takes path to training data for fruits dataset
 // returns a vector of vector of paths.
 // each inner vector is a folder and the folder names
+
 vector<vector<std::filesystem::path>>
 load_fruits_dataset(std::filesystem::path training) {
 

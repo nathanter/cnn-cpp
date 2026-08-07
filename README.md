@@ -52,6 +52,14 @@ The results below were computed with either a hidden layer with 64 neurons and a
 along with the implemented neural network is classes for a Tensor object, a 3x3 2D Conv Layer, a 2x2 2D Pool layer, and a layer with weights and biases.
 
 
+# optimizations:
+
+Prio to Aug 5th - convolution layer took too long.
+
+- Conv layer optimization included moving repeated calculations and vector initializations out of the main loop so significantly less calculations were performed.
+- added safety checks to convolution backprop such that allows the compiler to do allocation elision 
+
+
 
 # Results:
 
@@ -59,9 +67,10 @@ Note: The overall accuracy for the fruits_360 dataset is not as high as normal i
 
 
 Fashion-Mnist- 10 Classes:
-* Trial 1: 90.04.  20 epochs. 10 convolution layer nodes
-* Trial 2: 91.29.  15 epochs. 20 convolution layer nodes.
+* Trial 1: 90.04.  20 epochs. 10 convolution layer nodes. Hidden layer size 64
+* Trial 2: 91.77.  17 epochs. 32 convolution layer nodes. Hidden layer size 64
 * Trial 3: 80.23.  5 epochs. only 1 layer.
+* Trial 4: 92.23.  20 Epochs. 40 Convolution layer nodes. Hiddel layer size 64.
 
 Fruits- 6 Classes(first 6 folders of apples out of 237 fruits):
 * Trials 1-3: ~30%

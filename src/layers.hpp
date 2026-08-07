@@ -49,12 +49,18 @@ public:
   // note this function is moving towards just doing the arithmetic by hand because using the variable arg functions in tensor is too expensive.
   Tensor feed_forward(Tensor &input) {
     this->last_input = input;
+    const int F = this -> fil_size;
+    if (F != 3) throw std::runtime_error("filter must be 3x3"); 
+    // If make this function a template function, add general dispatch function that dispatches different versions of the template function based on template size.
+
     // not any tensor safe
     //  output tensor is a convoluted array representing the convoluted image
     //  for each node
     Tensor output(this->nodes, input.dimen_list[0] - 2,
                   input.dimen_list[1] - 2);
 
+
+    
     // for x indexes
     // run 3 by 3 filter on 0
     // all the way to size - 3
@@ -68,13 +74,13 @@ public:
           float sum = 0.00;
           int start_of_filter_in_input = ax1 * input.indexing_list[0] + ax2 * input.indexing_list[1];
             
-          
-          for (int f1 = 0; f1 < fil_size; f1++) {
+          // using F here (the const we established above) allows the compiler to stop looping in the machine instructions which optimizes this portion marginally
+          for (int f1 = 0; f1 < F; f1++) {
             int place_in_input_tensor = input.indexing_list[0] * f1 + start_of_filter_in_input;
-            for (int f2 = 0; f2 < fil_size; f2++) {
+            for (int f2 = 0; f2 < F; f2++) {
               sum += static_cast<float>(
                   input.get_element_flat(place_in_input_tensor + f2) *
-                  this -> data.get_element_flat(start_of_filter_in_conv_weights + f1 * fil_size + f2));
+                  this -> data.get_element_flat(start_of_filter_in_conv_weights + f1 * F + f2));
             }
           }
 
@@ -89,9 +95,13 @@ public:
     return output;
   }
 
+  
   void backprop(Tensor &losses) {
-    Tensor dl_dfilter = data;
-    dl_dfilter.zeros();
+    const int F = this -> fil_size;
+    if (F != 3) throw std::runtime_error("filter must be 3x3");
+   // same reasoning as feed forward. allows unrolling.
+
+    Tensor dl_dfilter(data.dimen_list);
 
     for (int x = 0; x < nodes; x++) {
       // nodes is number of filters here
@@ -99,29 +109,40 @@ public:
       float loss_sum = 0.0f;
       // loss_sum is the sum of all gradients for this filter, will be
       // subtracted from bias.
+      const int last_input_width = last_input.indexing_list[0];
+      const int last_input_height = last_input.indexing_list[1];
+      int index_offset = dl_dfilter.flat_from_indexes(x, 0, 0);
+      // index_offset is the location where the current filter stars in the
+      // conv layers data
       for (int ax1 = 0; ax1 < losses.dimen_list[1]; ax1++) {
         int current_start_of_row = losses.flat_from_indexes(x,ax1,0);
+
         for (int ax2 = 0; ax2 < losses.dimen_list[2]; ax2++) {
 
-          int index_offset = dl_dfilter.flat_from_indexes(x, 0, 0);
-          // index_offset is the location where the current filter stars in the
-          // conv layers data
+          
+
           float current_element_in_loss_gradient =
             losses.get_element_flat(current_start_of_row + ax2);
 
           // current_element_in_loss_gradient is the element in the input
           // gradient that affects all the filters;
-          loss_sum += current_element_in_loss_gradient;
-          for (int f1 = 0; f1 < fil_size; f1++) {
-            int affected_pixels_by_filter_row =
-                last_input.flat_from_indexes(ax1 + f1, ax2);
-            for (int f2 = 0; f2 < fil_size; f2++) {
 
+          loss_sum += current_element_in_loss_gradient;
+          int starting_index_of_pixels_affected_by_filter = last_input.flat_from_indexes(ax1, ax2);
+          for (int f1 = 0; f1 < F; f1++) {
+
+            /*int affected_pixels_by_filter_row =
+                last_input.flat_from_indexes(ax1 + f1, ax2);*/
+
+
+
+            for (int f2 = 0; f2 < F; f2++) {
+                // TODY: check if changes here are right
               dl_dfilter.add_to_index(
-                  index_offset + f1 * fil_size + f2,
+                  index_offset + f1 * F + f2,
                   current_element_in_loss_gradient *
                       last_input.get_element_flat(
-                        affected_pixels_by_filter_row + f2));
+                        starting_index_of_pixels_affected_by_filter + f1 * last_input_width + f2));
             }
           }
         }
@@ -189,7 +210,7 @@ public:
     for (int x = 0; x < nodes; x++) {
       float d_product = 0;
       int index_offset = x * this->inputs;
-      
+
       for (int y = 0; y < this->inputs; y++) {
         d_product += i_d[y] * w_d[index_offset + y];
       }

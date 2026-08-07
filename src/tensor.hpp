@@ -33,8 +33,8 @@ public:
 
   template <class... Types> int flat_from_indexes(Types... indexes) const {
 
-    vector<int> arr{indexes...};
-    if (static_cast<int>(arr.size()) != dimensions) {
+    const int arr[] = {indexes...};
+    if (static_cast<int>(sizeof...(indexes)) != dimensions) {
       throw std::runtime_error("Number of indexes does not match dimensions");
     }
 
@@ -83,14 +83,13 @@ public:
   template <class... Types>
   Tensor(Types... args) : dimensions{sizeof...(args)} {
 
-    vector<int> arr{args...};
-    this->dimen_list = arr;
+    this->dimen_list = {args...};
     this->indexing_list = vector<int>(dimensions);
     int total_size{1};
 
     for (int l = 0; l < this->dimensions; l++) {
 
-      total_size *= arr[l];
+      total_size *= dimen_list[l];
     }
 
     this->indexing_list[dimensions - 1] = 1;
@@ -105,6 +104,7 @@ public:
   }
   Tensor(const vector<int>& inputarray)
       : dimensions{static_cast<int>(inputarray.size())} {
+
     this->dimen_list = inputarray;
     int total_size{1};
     this->indexing_list = vector<int>(dimensions);
