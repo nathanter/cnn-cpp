@@ -16,6 +16,7 @@ scripts/verify
 tests/*
 !tests/compiler-opt-test.cpp
 !tests/bench_conv.cpp
+!tests/backprop-opt-test.cpp
 handoff.md
 bench_conv
 accum-conv-opt.md

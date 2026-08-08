@@ -52,13 +52,25 @@ The results below were computed with either a hidden layer with 64 neurons and a
 along with the implemented neural network is classes for a Tensor object, a 3x3 2D Conv Layer, a 2x2 2D Pool layer, and a layer with weights and biases.
 
 
-# optimizations:
+# optimization process:
 
-Prio to Aug 5th - convolution layer took too long.
 
-- Conv layer optimization included moving repeated calculations and vector initializations out of the main loop so significantly less calculations were performed.
-- added safety checks to convolution backprop such that allows the compiler to do allocation elision 
 
+Prior to Aug 5th the convolution layer took too long.
+
+- Conv layer optimization for backpropagation and forward propagation included moving repeated calculations and vector initializations out of the main loop. 
+- Removed unnecessary duplicated logic in get_element_by_indexes() that allows compiler to use flat_from_indexes() which was optimized by compiler instead of heap allocation. Get_element_by_indexed() build a new `vector<int>` which is allocated to heap. Size checks in flat_from_indexes() informs compiler on that sizing is correct so it can elide vector allocation and stop actually looping and use straight instructions.
+- added similar safety/size checks to convolution backprop and other functions so it allows the compiler to also do allocation elision or loop unrolling (Only available when compiling with O3 and O2 tags) 
+- Improved tensor intilization and indexing functions more efficient by using c style arrays instead of vector intilization. Improved convolution backprop from 80us to ~60 us
+- Forward pass of convolution layer from > 6000 us to <20 us in total. Back propagation from >80us to ~25 us in latest changes.
+- Back propagation used to take longer but did some optimizations before Aug 5th in earlier commits.
+- This reduces 2 hours of training time to around a minute.
+
+
+Measured with 20 filters, 28x28 input, 2000 iterations, median of 3
+runs. Apple M1 (4 performance + 4 efficiency cores), 16 GB, macOS 15.6, Apple clang 17.0.0, arm64, `-O3` on build.
+
+Files in tests/ have build commands for scripts that check if size checks actually cause speedups, check the total optimizations not including tensor changes, and measure current speed of convolution layer.
 
 
 # Results:

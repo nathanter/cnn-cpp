@@ -4,10 +4,6 @@
 //   g++ -std=c++17 -O3 -Isrc tests/bench_conv.cpp -o bench_conv
 //   ./bench_conv
 //
-// Header-only -- layers.hpp and tensor.hpp are all it needs, so no other
-// translation units get linked. Keep -O3: without it the numbers are
-// meaningless for the optimizations this measures.
-//
 // The first measurement in a process runs cold -- process startup, cold
 // caches, CPU frequency ramp -- and reads high enough to mislead. forward
 // came out anywhere from 12 to 24 us/image on IDENTICAL code depending on
@@ -31,7 +27,7 @@ int main() {
   Tensor image(28, 28);
   for (int i = 0; i < image.size; i++) image.data[i] = next_val();
 
-  
+
   Tensor grad(20, 26, 26);
   for (int i = 0; i < grad.size; i++) grad.data[i] = next_val() * 0.001f;
 

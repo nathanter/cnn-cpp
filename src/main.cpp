@@ -26,7 +26,7 @@ namespace
     constexpr int kWidth = 28;
     constexpr int kHeight = 28;
     constexpr int kLabels = 10;
-    constexpr int kConvNodes = 64;
+    constexpr int kConvNodes = 40;
     constexpr int kEpochs = 20;
     constexpr int kDenseInputSize = ((kWidth - 2) / 2) * ((kHeight - 2) / 2) * kConvNodes;
 
